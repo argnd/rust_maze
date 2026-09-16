@@ -1,5 +1,7 @@
 mod app;
-
+mod grid;
+mod tiles;
+mod algorithms;
 use app::MazeApp;
 use eframe::egui;
 
@@ -11,6 +13,6 @@ fn main() -> eframe::Result {
     eframe::run_native(
         "Maze generator",
         options,
-        Box::new(|_cc| Ok(Box::new(MazeApp))),
+        Box::new(|cc| Ok(Box::new(MazeApp::new(cc)))),
     )
 }
