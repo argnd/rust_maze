@@ -70,6 +70,11 @@ impl Grid {
         farthest
     }
 
+    /// Back to the all-wall state, keeping the same size.
+    pub fn reset(&mut self) {
+        self.cells.fill(Cell::Wall);
+    }
+
     pub fn width(&self) -> usize {
         self.width
     }

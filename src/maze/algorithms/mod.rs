@@ -2,7 +2,21 @@ pub mod backtracker;
 
 use rand::Rng;
 
+use crate::maze::MazeKind;
 use crate::maze::grid::{Cell, Grid, Step};
+
+pub fn generate(
+    kind: MazeKind,
+    corridors_x: usize,
+    corridors_y: usize,
+    rng: &mut impl Rng,
+) -> Vec<Step> {
+    match kind {
+        MazeKind::Perfect => generate_perfect(corridors_x, corridors_y, rng),
+        // Braiding and rooms come in later steps; until then every kind is a perfect maze.
+        MazeKind::Imperfect | MazeKind::Dungeon => generate_perfect(corridors_x, corridors_y, rng),
+    }
+}
 
 /// A perfect maze: carve with the algorithm, then place Start and End.
 /// The carving is replayed once, silently, to know the final layout and
