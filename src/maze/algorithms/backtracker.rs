@@ -1,7 +1,7 @@
 use rand::Rng;
 use rand::seq::IndexedRandom;
 
-use crate::grid::{neighbours, Cell, Step};
+use crate::maze::grid::{neighbours, Cell, Step};
 
 /// Recursive backtracker, iterative form: walk to a random unvisited
 /// neighbour, knocking down the wall in between; when stuck, step back.

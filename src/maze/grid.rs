@@ -1,5 +1,3 @@
-use crate::tiles::Tiles;
-use eframe::egui;
 use std::collections::VecDeque;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -86,32 +84,6 @@ impl Grid {
 
     pub fn set(&mut self, x: usize, y: usize, cell: Cell) {
         self.cells[y * self.width + x] = cell;
-    }
-
-    pub fn draw(&self, ui: &mut egui::Ui, tiles: &Tiles) {
-        let available = ui.available_size();
-        let cell_size = (available.x / self.width as f32)
-            .min(available.y / self.height as f32)
-            .floor();
-        let size = egui::vec2(
-            cell_size * self.width as f32,
-            cell_size * self.height as f32,
-        );
-        let (response, painter) = ui.allocate_painter(size, egui::Sense::hover());
-        let origin = response.rect.min;
-        let uv = egui::Rect::from_min_max(egui::pos2(0.0, 0.0), egui::pos2(1.0, 1.0));
-
-        for y in 0..self.height {
-            for x in 0..self.width {
-                let cell = self.get(x, y);
-                let min = origin + egui::vec2(x as f32 * cell_size, y as f32 * cell_size);
-                let rect = egui::Rect::from_min_size(min, egui::vec2(cell_size, cell_size));
-                if cell != Cell::Wall && cell != Cell::Floor {
-                    painter.image(tiles.floor(), rect, uv, egui::Color32::WHITE);
-                }
-                painter.image(tiles.for_cell(cell), rect, uv, egui::Color32::WHITE);
-            }
-        }
     }
 }
 

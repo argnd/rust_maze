@@ -1,6 +1,6 @@
 use eframe::egui;
 
-use crate::grid::Cell;
+use crate::maze::grid::Cell;
 
 pub struct Tiles {
     wall: egui::TextureHandle,
@@ -13,11 +13,11 @@ pub struct Tiles {
 impl Tiles {
     pub fn load(ctx: &egui::Context) -> Self {
         Self {
-            wall: load_png(ctx, "wall", include_bytes!("../assets/tiles/wall.png")),
-            floor: load_png(ctx, "floor", include_bytes!("../assets/tiles/floor.png")),
-            door: load_png(ctx, "door", include_bytes!("../assets/tiles/door.png")),
-            start: load_png(ctx, "start", include_bytes!("../assets/tiles/start.png")),
-            end: load_png(ctx, "end", include_bytes!("../assets/tiles/end.png")),
+            wall: load_png(ctx, "wall", include_bytes!("../../assets/tiles/wall.png")),
+            floor: load_png(ctx, "floor", include_bytes!("../../assets/tiles/floor.png")),
+            door: load_png(ctx, "door", include_bytes!("../../assets/tiles/door.png")),
+            start: load_png(ctx, "start", include_bytes!("../../assets/tiles/start.png")),
+            end: load_png(ctx, "end", include_bytes!("../../assets/tiles/end.png")),
         }
     }
 

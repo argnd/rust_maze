@@ -1,9 +1,8 @@
-mod app;
-mod grid;
-mod tiles;
-mod algorithms;
-use app::MazeApp;
+mod maze;
+mod ui;
+
 use eframe::egui;
+use ui::MazeApp;
 
 fn main() -> eframe::Result {
     let options = eframe::NativeOptions {

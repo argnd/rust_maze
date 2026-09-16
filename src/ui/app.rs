@@ -1,8 +1,9 @@
 use eframe::egui;
 
-use crate::algorithms;
-use crate::grid::{Grid, Step};
-use crate::tiles::Tiles;
+use super::render::draw_grid;
+use super::tiles::Tiles;
+use crate::maze::algorithms;
+use crate::maze::grid::{Grid, Step};
 
 const CORRIDORS_X: usize = 20;
 const CORRIDORS_Y: usize = 15;
@@ -58,7 +59,7 @@ impl eframe::App for MazeApp {
                 self.advance();
                 ui.ctx().request_repaint();
             }
-            self.grid.draw(ui, &self.tiles);
+            draw_grid(ui, &self.grid, &self.tiles);
         });
     }
 }

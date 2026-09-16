@@ -2,7 +2,7 @@ pub mod backtracker;
 
 use rand::Rng;
 
-use crate::grid::{Cell, Grid, Step};
+use crate::maze::grid::{Cell, Grid, Step};
 
 /// A perfect maze: carve with the algorithm, then place Start and End.
 /// The carving is replayed once, silently, to know the final layout and
