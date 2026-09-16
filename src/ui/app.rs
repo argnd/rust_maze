@@ -3,7 +3,7 @@ use eframe::egui;
 use super::render::draw_grid;
 use super::tiles::Tiles;
 use crate::maze::MazeKind;
-use crate::maze::algorithms;
+use crate::maze::algorithms::{self, Algorithm};
 use crate::maze::grid::{Grid, Step};
 
 /// How many of the most recently applied steps are highlighted during the replay.
@@ -13,6 +13,7 @@ const TRAIL_LENGTH: usize = 5;
 /// squares; the grid is 2n+1 squares wide (see Grid::new).
 struct Settings {
     kind: MazeKind,
+    algorithm: Algorithm,
     corridors_x: usize,
     corridors_y: usize,
 }
@@ -32,6 +33,7 @@ impl Replay {
             grid: Grid::new(settings.corridors_x, settings.corridors_y),
             steps: algorithms::generate(
                 settings.kind,
+                settings.algorithm,
                 settings.corridors_x,
                 settings.corridors_y,
                 &mut rand::rng(),
@@ -89,6 +91,7 @@ impl MazeApp {
             screen: Screen::Menu,
             settings: Settings {
                 kind: MazeKind::Perfect,
+                algorithm: Algorithm::Backtracker,
                 corridors_x: 20,
                 corridors_y: 15,
             },
@@ -105,6 +108,13 @@ impl MazeApp {
             .show_ui(ui, |ui| {
                 for kind in MazeKind::ALL {
                     ui.selectable_value(&mut self.settings.kind, kind, kind.label());
+                }
+            });
+        egui::ComboBox::from_label("Algorithm")
+            .selected_text(self.settings.algorithm.label())
+            .show_ui(ui, |ui| {
+                for algorithm in Algorithm::ALL {
+                    ui.selectable_value(&mut self.settings.algorithm, algorithm, algorithm.label());
                 }
             });
         ui.add(egui::Slider::new(&mut self.settings.corridors_x, 5..=60).text("width"));

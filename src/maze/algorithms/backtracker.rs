@@ -1,7 +1,8 @@
 use rand::Rng;
 use rand::seq::IndexedRandom;
 
-use crate::maze::grid::{Cell, Step, neighbours};
+use super::{floor, wall_between};
+use crate::maze::grid::{Step, neighbours};
 
 /// Recursive backtracker, iterative form: walk to a random unvisited
 /// neighbour, knocking down the wall in between; when stuck, step back.
@@ -24,22 +25,9 @@ pub fn carve(corridors_x: usize, corridors_y: usize, rng: &mut impl Rng) -> Vec<
         };
 
         visited[ny * corridors_x + nx] = true;
-        // The wall square between two corridor squares is their midpoint.
-        steps.push(Step {
-            x: x + nx + 1,
-            y: y + ny + 1,
-            cell: Cell::Floor,
-        });
+        steps.push(wall_between(x, y, nx, ny));
         steps.push(floor(nx, ny));
         stack.push((nx, ny));
     }
     steps
-}
-
-fn floor(corridor_x: usize, corridor_y: usize) -> Step {
-    Step {
-        x: corridor_x * 2 + 1,
-        y: corridor_y * 2 + 1,
-        cell: Cell::Floor,
-    }
 }
