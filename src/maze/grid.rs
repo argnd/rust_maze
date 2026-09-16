@@ -104,5 +104,3 @@ pub fn neighbours(x: usize, y: usize, width: usize, height: usize) -> Vec<(usize
     }
     out
 }
-
-

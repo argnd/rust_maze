@@ -18,8 +18,16 @@ pub fn generate_perfect(corridors_x: usize, corridors_y: usize, rng: &mut impl R
     let (end_x, end_y) = finished.farthest_walkable_from(1, 1);
 
     let mut steps = vec![
-        Step { x: 1, y: 1, cell: Cell::Start },
-        Step { x: end_x, y: end_y, cell: Cell::End },
+        Step {
+            x: 1,
+            y: 1,
+            cell: Cell::Start,
+        },
+        Step {
+            x: end_x,
+            y: end_y,
+            cell: Cell::End,
+        },
     ];
     steps.extend(carving);
     steps

@@ -35,6 +35,10 @@ pub fn draw_grid(ui: &mut egui::Ui, grid: &Grid, tiles: &Tiles, trail: &[Step]) 
 
     let highlight = egui::Color32::from_rgba_unmultiplied(60, 120, 255, 140);
     for step in trail {
-        painter.rect_filled(cell_rect(step.x, step.y), egui::CornerRadius::ZERO, highlight);
+        painter.rect_filled(
+            cell_rect(step.x, step.y),
+            egui::CornerRadius::ZERO,
+            highlight,
+        );
     }
 }
