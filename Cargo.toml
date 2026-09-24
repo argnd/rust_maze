@@ -7,3 +7,9 @@ edition = "2024"
 eframe = "0.36.2"
 rand = "0.10.2"
 image = "0.25.10"
+
+# Smaller, faster exe for `cargo build --release`; debug builds are untouched.
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true

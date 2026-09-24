@@ -61,7 +61,7 @@ impl Grid {
             let next_distance = distance[y * self.width + x] + 1;
             for (nx, ny) in neighbours(x, y, self.width, self.height) {
                 let index = ny * self.width + nx;
-                if self.get(nx, ny) != Cell::Wall && distance[index] == usize::MAX {
+                if self.walkable(nx, ny) && distance[index] == usize::MAX {
                     distance[index] = next_distance;
                     queue.push_back((nx, ny));
                 }
@@ -81,6 +81,11 @@ impl Grid {
 
     pub fn height(&self) -> usize {
         self.height
+    }
+
+    /// Anything that is not a wall can be walked on: floor, doors, start, end.
+    pub fn walkable(&self, x: usize, y: usize) -> bool {
+        self.get(x, y) != Cell::Wall
     }
 
     pub fn get(&self, x: usize, y: usize) -> Cell {

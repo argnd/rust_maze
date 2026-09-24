@@ -16,6 +16,8 @@ struct Settings {
     algorithm: Algorithm,
     corridors_x: usize,
     corridors_y: usize,
+    /// Share of dead ends turned into loops, imperfect mazes only.
+    braiding: f32,
 }
 
 /// A generation being replayed: the grid as it currently looks, the full
@@ -36,6 +38,7 @@ impl Replay {
                 settings.algorithm,
                 settings.corridors_x,
                 settings.corridors_y,
+                settings.braiding,
                 &mut rand::rng(),
             ),
             next_step: 0,
@@ -94,6 +97,7 @@ impl MazeApp {
                 algorithm: Algorithm::Backtracker,
                 corridors_x: 20,
                 corridors_y: 15,
+                braiding: 0.5,
             },
             steps_per_second: 120.0,
             tiles: Tiles::load(&cc.egui_ctx),
@@ -119,6 +123,9 @@ impl MazeApp {
             });
         ui.add(egui::Slider::new(&mut self.settings.corridors_x, 5..=60).text("width"));
         ui.add(egui::Slider::new(&mut self.settings.corridors_y, 5..=45).text("height"));
+        if self.settings.kind == MazeKind::Imperfect {
+            ui.add(egui::Slider::new(&mut self.settings.braiding, 0.0..=1.0).text("loops"));
+        }
         ui.add_space(8.0);
         if ui.button("Generate").clicked() {
             self.screen = Screen::Viewing(Replay::new(&self.settings));
