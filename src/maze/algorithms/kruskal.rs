@@ -10,19 +10,17 @@ use crate::maze::grid::Step;
 /// different groups, which then merge.
 pub fn carve(lattice: &Lattice, rng: &mut impl Rng) -> Vec<Step> {
     let mut groups = DisjointSets::new(lattice.len());
-
-    // Each wall once: a corridor lists only its right and lower neighbours.
-    let mut walls = Vec::new();
-    for (x, y) in lattice.corridors() {
-        for (nx, ny) in lattice.neighbours(x, y) {
-            if nx > x || ny > y {
-                walls.push(((x, y), (nx, ny)));
-            }
-        }
-    }
+    let mut walls = lattice.edges();
     walls.shuffle(rng);
 
-    let mut steps = Vec::new();
+    // Corridors that no wall ever reaches (a pocket of one) still need a floor.
+    let mut steps: Vec<Step> = lattice
+        .corridors()
+        .into_iter()
+        .filter(|&(x, y)| lattice.neighbours(x, y).is_empty())
+        .map(|(x, y)| floor(x, y))
+        .collect();
+
     for ((ax, ay), (bx, by)) in walls {
         if groups.merge(lattice.index(ax, ay), lattice.index(bx, by)) {
             steps.push(floor(ax, ay));

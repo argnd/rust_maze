@@ -1,11 +1,12 @@
 use rand::Rng;
 use rand::seq::IndexedRandom;
 
-use super::{Lattice, floor, wall_between};
-use crate::maze::grid::Step;
+use super::{Lattice, between, corridor, floor, wall_between};
+use crate::maze::grid::{Cell, Step};
 
 /// Recursive backtracker, iterative form: walk to a random unvisited
 /// neighbour, knocking down the wall in between; when stuck, step back.
+/// The stack is shown as probe squares and turns to floor as it unwinds.
 pub fn carve(lattice: &Lattice, rng: &mut impl Rng) -> Vec<Step> {
     let mut visited = vec![false; lattice.len()];
     let mut steps = Vec::new();
@@ -17,7 +18,7 @@ pub fn carve(lattice: &Lattice, rng: &mut impl Rng) -> Vec<Step> {
             continue;
         }
         visited[lattice.index(seed_x, seed_y)] = true;
-        steps.push(floor(seed_x, seed_y));
+        steps.push(corridor(seed_x, seed_y, Cell::Probe));
         let mut stack = vec![(seed_x, seed_y)];
 
         while let Some(&(x, y)) = stack.last() {
@@ -29,12 +30,16 @@ pub fn carve(lattice: &Lattice, rng: &mut impl Rng) -> Vec<Step> {
 
             let Some(&(nx, ny)) = candidates.choose(rng) else {
                 stack.pop();
+                steps.push(floor(x, y));
+                if let Some(&(px, py)) = stack.last() {
+                    steps.push(wall_between(px, py, x, y));
+                }
                 continue;
             };
 
             visited[lattice.index(nx, ny)] = true;
-            steps.push(wall_between(x, y, nx, ny));
-            steps.push(floor(nx, ny));
+            steps.push(between(x, y, nx, ny, Cell::Probe));
+            steps.push(corridor(nx, ny, Cell::Probe));
             stack.push((nx, ny));
         }
     }

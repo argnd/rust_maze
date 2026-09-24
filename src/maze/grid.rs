@@ -7,11 +7,15 @@ pub enum Cell {
     Door,
     Start,
     End,
+    /// A square an algorithm is still working on: the backtracker's stack,
+    /// Prim's frontier, Wilson's random walk. Shown during generation only;
+    /// a finished maze never contains one.
+    Probe,
 }
 
 /// One change to the grid, in square coordinates. Algorithms produce a list
 /// of these; the app replays them to animate the generation.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub struct Step {
     pub x: usize,
     pub y: usize,
@@ -75,6 +79,12 @@ impl Grid {
         self.cells.fill(Cell::Wall);
     }
 
+    /// The first square holding `cell`, scanning row by row.
+    pub fn find(&self, cell: Cell) -> Option<(usize, usize)> {
+        let i = self.cells.iter().position(|&c| c == cell)?;
+        Some((i % self.width, i / self.width))
+    }
+
     pub fn width(&self) -> usize {
         self.width
     }
@@ -83,9 +93,13 @@ impl Grid {
         self.height
     }
 
-    /// Anything that is not a wall can be walked on: floor, doors, start, end.
+    /// Floor, doors, start and end can be walked on; walls and squares an
+    /// algorithm is still probing cannot.
     pub fn walkable(&self, x: usize, y: usize) -> bool {
-        self.get(x, y) != Cell::Wall
+        matches!(
+            self.get(x, y),
+            Cell::Floor | Cell::Door | Cell::Start | Cell::End
+        )
     }
 
     pub fn get(&self, x: usize, y: usize) -> Cell {

@@ -2,7 +2,7 @@ use rand::seq::IndexedRandom;
 use rand::{Rng, RngExt};
 
 use super::disjoint_sets::DisjointSets;
-use super::{Algorithm, Lattice, grid_after, with_start_and_end};
+use super::{Algorithm, Lattice, Recorder, carve_into, grid_after};
 use crate::maze::grid::{Cell, Grid, Step, neighbours};
 
 /// A room in corridor coordinates: corridors x..x+width by y..y+height.
@@ -54,16 +54,17 @@ impl Room {
 
 /// Rooms first, then the chosen algorithm fills the space around them with
 /// corridors, then doors join every region into one, then corridors that
-/// lead nowhere are filled back in.
-pub fn generate(
+/// lead nowhere are filled back in. Returns the square the maze starts from.
+pub(super) fn generate(
+    recorder: &mut Recorder,
     algorithm: Algorithm,
     corridors_x: usize,
     corridors_y: usize,
     rng: &mut impl Rng,
-) -> Vec<Step> {
-    let mut steps = Vec::new();
+) -> (usize, usize) {
     let mut lattice = Lattice::open(corridors_x, corridors_y);
 
+    recorder.phase("Placing rooms", 6.0);
     let rooms = place_rooms(corridors_x, corridors_y, rng);
     for room in &rooms {
         for y in room.y..room.y + room.height {
@@ -71,23 +72,23 @@ pub fn generate(
                 lattice.block(x, y);
             }
         }
-        for (x, y) in room.squares() {
-            steps.push(Step {
-                x,
-                y,
-                cell: Cell::Floor,
-            });
-        }
+        recorder.extend(room.squares().into_iter().map(|(x, y)| Step {
+            x,
+            y,
+            cell: Cell::Floor,
+        }));
     }
 
-    steps.extend(algorithm.carve(&lattice, rng));
+    carve_into(recorder, algorithm, &lattice, rng);
 
-    let mut grid = grid_after(corridors_x, corridors_y, &steps);
-    steps.extend(connect_regions(&mut grid, rng));
-    steps.extend(prune_dead_ends(&mut grid, &rooms));
+    let mut grid = grid_after(corridors_x, corridors_y, &recorder.steps);
+    // Slower than normal: there are few doors, and they are the point.
+    recorder.phase("Opening doors", 0.5);
+    recorder.extend(connect_regions(&mut grid, rng));
+    recorder.phase("Pruning dead ends", 4.0);
+    recorder.extend(prune_dead_ends(&mut grid, &rooms));
 
-    let start = rooms.first().map(Room::centre).unwrap_or((1, 1));
-    with_start_and_end(steps, corridors_x, corridors_y, start)
+    rooms.first().map(Room::centre).unwrap_or((1, 1))
 }
 
 /// Random rectangles, kept only when they don't come too close to an
